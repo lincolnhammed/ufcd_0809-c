@@ -253,7 +253,7 @@ int main()
             break;
         }
         case 'Q':
-            menuQuadrilatero();
+            menuQuadrilatero(); 
             break;
         case 'S':
 

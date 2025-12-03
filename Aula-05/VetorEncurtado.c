@@ -10,26 +10,44 @@ armazene-os num vetor e remova todos os elementos
  */
 
 int main() {
-    
 
     int num[MAX];
-    int numUsuario=0;
-    int cont=0;
- 
-    for (size_t i = 0; i < MAX; i++)
-    {
-       printf("Digite o %d° numero", i+1);
-        scanf("%d",&num[i]);      
+    int numUsuario = 0;
+    int cont = 0;
+
+    // Ler números
+    for (size_t i = 0; i < MAX; i++) {
+        printf("Digite o %d° número: ", i + 1);
+        scanf("%d", &num[i]);
     }
-        printf ("Digite usuuario\n");
-        scanf("%d",&numUsuario);
-        for (size_t i = 0; i < MAX; i++)
-        {
-            if (numUsuario != num[i] )
-            {
-               num[i]= num[i];
-               printf("%5d",num[i]);
-            }  
+
+    printf("Digite o número a remover: ");
+    scanf("%d", &numUsuario);
+
+    // Primeiro conta quantos são diferentes
+    for (size_t i = 0; i < MAX; i++) {
+        if (num[i] != numUsuario) {
+            cont++;
         }
+    }
+
+    int num2[cont]; // vetor compactado
+    int j = 0;      // índice correto para num2
+
+    // Copiar somente os diferentes
+    for (size_t i = 0; i < MAX; i++) {
+        if (num[i] != numUsuario) {
+            num2[j] = num[i];
+            j++;
+        }
+    }
+
+    // Mostrar vetor compactado
+    printf("\nVetor compactado: ");
+    for (size_t i = 0; i < cont; i++) {
+        printf("%d ", num2[i]);
+    }
+
+    printf("\n");
     return 0;
 }

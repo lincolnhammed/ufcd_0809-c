@@ -4,6 +4,7 @@ int main()
 {
     int n1;
     int *v1;
+    
     printf("Insira um valor\n");
     scanf("%d", &n1);
     aumenta(&n1);

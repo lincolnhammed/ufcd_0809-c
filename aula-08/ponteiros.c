@@ -23,6 +23,7 @@ int main()
         printf("valor de valor1 %d\n", valor1);
     printf("valor para onde aponta p %d\n", *p);
 
+    printf("endereco de memoria %p %p",&valor1,p);
 
     return 0;
 }

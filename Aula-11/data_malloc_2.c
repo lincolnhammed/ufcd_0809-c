@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <time.h>
 
 typedef struct {
     int dia;
@@ -8,8 +9,11 @@ typedef struct {
     int ano;
 } Data;
 
-// Funções
+/* Protótipos */
 char menu_principal();
+int ano_atual();
+int data_valida(int d, int m, int a);
+
 Data* adicionar_data(Data *v_data, int *qt_datas);
 Data* adicionar_varias_datas(Data *v_data, int *qt_datas);
 void mostrar_uma_data(Data dat);
@@ -39,6 +43,10 @@ int main() {
                 break;
 
             case 'm': {
+                if(qt_datas == 0) {
+                    printf("Não existem datas armazenadas.\n");
+                    break;
+                }
                 int idx = procurar_uma_data(v_data, qt_datas);
                 if(idx == -1)
                     printf("Essa data não existe!\n");
@@ -60,7 +68,11 @@ int main() {
                 break;
 
             case 'o':
-                ordenar_por_ano(v_data, qt_datas);
+                if(qt_datas < 2) {
+                    printf("São necessárias pelo menos duas datas para ordenar.\n");
+                } else {
+                    ordenar_por_ano(v_data, qt_datas);
+                }
                 break;
 
             case 's':
@@ -77,161 +89,168 @@ int main() {
     return 0;
 }
 
-// Menu principal
+/* ================= FUNÇÕES ================= */
+
 char menu_principal() {
     char op;
     printf("\n====== Menu ======\n");
     printf("(a) Adicionar uma data\n");
-    printf("(j) Adicionar várias datas de uma vez\n");
-    printf("(m) Mostrar os dados de uma data\n");
+    printf("(j) Adicionar várias datas\n");
+    printf("(m) Mostrar uma data\n");
     printf("(t) Mostrar todas as datas\n");
     printf("(r) Remover uma data\n");
     printf("(e) Editar uma data\n");
-    printf("(o) Ordenar as datas por ano\n");
+    printf("(o) Ordenar por ano\n");
     printf("(s) Sair\n");
-    printf("Escolha uma opção: ");
+    printf("Opção: ");
     scanf(" %c", &op);
     return op;
 }
 
-// Adicionar uma data
+int ano_atual() {
+    time_t t = time(NULL);
+    struct tm *tm_info = localtime(&t);
+    return tm_info->tm_year + 1900;
+}
+
+int data_valida(int d, int m, int a) {
+    if(d < 1 || d > 31) return 0;
+    if(m < 1 || m > 12) return 0;
+    if(a < 1 || a > ano_atual()) return 0;
+    return 1;
+}
+
 Data* adicionar_data(Data *v_data, int *qt_datas) {
+    Data temp;
+
+    do {
+        printf("Dia: "); scanf("%d", &temp.dia);
+        printf("Mês: "); scanf("%d", &temp.mes);
+        printf("Ano: "); scanf("%d", &temp.ano);
+
+        if(!data_valida(temp.dia, temp.mes, temp.ano))
+            printf("Data inválida! Tente novamente.\n");
+
+    } while(!data_valida(temp.dia, temp.mes, temp.ano));
+
     Data *novo = realloc(v_data, (*qt_datas + 1) * sizeof(Data));
     if(novo == NULL) {
         printf("Erro de memória!\n");
         return v_data;
     }
+
     v_data = novo;
-    printf("Insira o dia: ");
-    scanf("%d", &v_data[*qt_datas].dia);
-    printf("Insira o mês: ");
-    scanf("%d", &v_data[*qt_datas].mes);
-    printf("Insira o ano: ");
-    scanf("%d", &v_data[*qt_datas].ano);
+    v_data[*qt_datas] = temp;
     (*qt_datas)++;
+
     return v_data;
 }
 
-// Adicionar várias datas
 Data* adicionar_varias_datas(Data *v_data, int *qt_datas) {
     int n;
     printf("Quantas datas deseja adicionar? ");
     scanf("%d", &n);
-    if(n <= 0) return v_data;
 
-    Data *novo = realloc(v_data, (*qt_datas + n) * sizeof(Data));
-    if(novo == NULL) {
-        printf("Erro de memória!\n");
-        return v_data;
-    }
-    v_data = novo;
     for(int i = 0; i < n; i++) {
-        printf("\nData %d:\n", i+1);
-        printf("Dia: "); scanf("%d", &v_data[*qt_datas].dia);
-        printf("Mês: "); scanf("%d", &v_data[*qt_datas].mes);
-        printf("Ano: "); scanf("%d", &v_data[*qt_datas].ano);
-        (*qt_datas)++;
+        printf("\nData %d:\n", i + 1);
+        v_data = adicionar_data(v_data, qt_datas);
     }
     return v_data;
 }
 
-// Mostrar uma data
 void mostrar_uma_data(Data dat) {
-    printf("Data: %02d/%02d/%04d\n", dat.dia, dat.mes, dat.ano);
+    printf("%02d/%02d/%04d\n", dat.dia, dat.mes, dat.ano);
 }
 
-// Mostrar todas as datas
 void mostrar_todas_datas(Data *v_data, int qt_datas) {
     if(qt_datas == 0) {
-        printf("Nenhuma data cadastrada.\n");
+        printf("Nenhuma data registada.\n");
         return;
     }
     for(int i = 0; i < qt_datas; i++) {
-        printf("%dª ", i+1);
+        printf("%dª - ", i + 1);
         mostrar_uma_data(v_data[i]);
     }
 }
 
-// Procurar uma data pelo índice
 int procurar_uma_data(Data *v_data, int qt_datas) {
-    if(qt_datas == 0) return -1;
     int idx;
-    printf("Qual o número da data (1 a %d)? ", qt_datas);
+    printf("Número da data (1 a %d): ", qt_datas);
     scanf("%d", &idx);
-    if(idx < 1 || idx > qt_datas) return -1;
+
+    if(idx < 1 || idx > qt_datas)
+        return -1;
+
     return idx - 1;
 }
 
-// Remover data
 Data* remover_data(Data *v_data, int *qt_datas) {
     if(*qt_datas == 0) {
-        printf("Nenhuma data para remover.\n");
+        printf("Não existem datas para remover.\n");
         return v_data;
     }
+
     int idx = procurar_uma_data(v_data, *qt_datas);
     if(idx == -1) {
-        printf("Essa data não existe!\n");
+        printf("Data inexistente.\n");
         return v_data;
     }
-    for(int i = idx; i < (*qt_datas) - 1; i++) {
+
+    for(int i = idx; i < *qt_datas - 1; i++)
         v_data[i] = v_data[i + 1];
-    }
+
     (*qt_datas)--;
-    if(*qt_datas == 0) {
-        free(v_data);
-        v_data = NULL;
-    } else {
-        Data *novo = realloc(v_data, (*qt_datas) * sizeof(Data));
-        if(novo != NULL) v_data = novo;
-    }
-    printf("Data removida com sucesso!\n");
+
+    Data *novo = realloc(v_data, (*qt_datas) * sizeof(Data));
+    if(novo || *qt_datas == 0)
+        v_data = novo;
+
+    printf("Data removida com sucesso.\n");
     return v_data;
 }
 
-// Editar data
 void editar_data(Data *v_data, int qt_datas) {
     if(qt_datas == 0) {
-        printf("Nenhuma data para editar.\n");
+        printf("Não existem datas para editar.\n");
         return;
     }
+
     int idx = procurar_uma_data(v_data, qt_datas);
     if(idx == -1) {
-        printf("Essa data não existe!\n");
+        printf("Data inexistente.\n");
         return;
     }
-    printf("Editar data %d:\n", idx+1);
-    printf("Novo dia: "); scanf("%d", &v_data[idx].dia);
-    printf("Novo mês: "); scanf("%d", &v_data[idx].mes);
-    printf("Novo ano: "); scanf("%d", &v_data[idx].ano);
-    printf("Data editada com sucesso!\n");
+
+    Data temp;
+    do {
+        printf("Novo dia: "); scanf("%d", &temp.dia);
+        printf("Novo mês: "); scanf("%d", &temp.mes);
+        printf("Novo ano: "); scanf("%d", &temp.ano);
+
+        if(!data_valida(temp.dia, temp.mes, temp.ano))
+            printf("Data inválida! Tente novamente.\n");
+
+    } while(!data_valida(temp.dia, temp.mes, temp.ano));
+
+    v_data[idx] = temp;
+    printf("Data editada com sucesso.\n");
 }
 
-// Ordenar por ano
 void ordenar_por_ano(Data *v_data, int qt_datas) {
-    if(qt_datas < 2) return;
-
     for(int i = 0; i < qt_datas - 1; i++) {
         for(int j = 0; j < qt_datas - i - 1; j++) {
-            // Comparar ano, mês e dia
-            int troca = 0;
-            if(v_data[j].ano > v_data[j+1].ano) {
-                troca = 1;
-            } else if(v_data[j].ano == v_data[j+1].ano) {
-                if(v_data[j].mes > v_data[j+1].mes) {
-                    troca = 1;
-                } else if(v_data[j].mes == v_data[j+1].mes) {
-                    if(v_data[j].dia > v_data[j+1].dia) {
-                        troca = 1;
-                    }
-                }
-            }
-            if(troca) {
+            if(v_data[j].ano > v_data[j + 1].ano ||
+              (v_data[j].ano == v_data[j + 1].ano &&
+               v_data[j].mes > v_data[j + 1].mes) ||
+              (v_data[j].ano == v_data[j + 1].ano &&
+               v_data[j].mes == v_data[j + 1].mes &&
+               v_data[j].dia > v_data[j + 1].dia)) {
+
                 Data tmp = v_data[j];
-                v_data[j] = v_data[j+1];
-                v_data[j+1] = tmp;
+                v_data[j] = v_data[j + 1];
+                v_data[j + 1] = tmp;
             }
         }
     }
-
     printf("Datas ordenadas cronologicamente.\n");
 }

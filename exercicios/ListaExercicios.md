@@ -63,3 +63,44 @@ Na opção de marcar como concluída, o programa deve solicitar o número da tar
 Na opção de remover, o programa deve solicitar o número da tarefa e removê-la do array, reorganizando corretamente a memória.
 
 O código deve estar livre de memory leaks (verificado com Valgrind). O menu e as funcionalidades devem estar separados em funções, não devendo toda a lógica ficar concentrada no `main`. A funcionalidade mínima obrigatória do programa é permitir adicionar, listar, marcar como concluída e remover tarefas.
+
+# Exercício: Inventory Manager (Gestor de Stock)
+
+Criar um programa em C que gerencie um inventário de produtos. O programa deve permitir adicionar produtos, listar o inventário, atualizar a quantidade em stock e remover produtos.
+
+O programa deve usar apenas arrays dinâmicos (`malloc` / `realloc`). Não são permitidas variáveis globais. Não é permitido usar funções de string avançadas (`strtok`, `strdup`), sendo permitido apenas `strlen`, `strcpy` e `strcmp`.
+
+O código deve compilar sem warnings com o comando:
+
+gcc -Wall -Wextra -Werror inventory.c -o inventory
+
+Cada produto deve ser representado pela seguinte estrutura:
+
+typedef struct {
+    int id;
+    char nome[50];
+    int quantidade;
+    float preco;
+} Produto;
+
+O campo `id` deve ser único e atribuído automaticamente pelo programa (incremental). Não é permitido inserir produtos com nomes duplicados. A quantidade não pode ser negativa e o preço deve ser maior que zero.
+
+O programa deve apresentar um menu com as seguintes opções:
+
+1 - Adicionar produto  
+2 - Listar produtos  
+3 - Atualizar stock  
+4 - Remover produto  
+5 - Sair  
+
+Na opção de adicionar, o programa deve solicitar o nome, a quantidade inicial e o preço do produto, validar os dados e adicioná-lo ao array dinâmico.
+
+Na opção de listar, todos os produtos devem ser exibidos mostrando o ID, nome, quantidade e preço.
+
+Na opção de atualizar stock, o programa deve solicitar o ID do produto e a nova quantidade. Caso o ID não exista, deve imprimir:
+
+Produto nao encontrado.
+
+Na opção de remover, o programa deve solicitar o ID do produto e removê-lo do array dinâmico, reorganizando corretamente a memória.
+
+O código deve estar livre de memory leaks (verificado com Valgrind). O menu e as funcionalidades devem estar separados em funções, não devendo toda a lógica ficar concentrada no `main`. A funcionalidade mínima obrigatória do programa é permitir adicionar, listar, atualizar stock e remover produtos.
